@@ -1,0 +1,6 @@
+@FamilyCart.API_HostAddress = http://localhost:5208
+
+GET {{FamilyCart.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

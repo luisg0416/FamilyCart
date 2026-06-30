@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="backend/FamilyCart.API/FamilyCart.API.csproj" />
+    <Project Path="backend/FamilyCart.Core/FamilyCart.Core.csproj" />
+    <Project Path="backend/FamilyCart.Infrastructure/FamilyCart.Infrastructure.csproj" />
+  </Folder>
+</Solution>
