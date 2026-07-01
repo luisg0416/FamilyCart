@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FamilyCart.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea024c8e138bfb31b5d5fef56833555394249c3f")]
 [assembly: System.Reflection.AssemblyProductAttribute("FamilyCart.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FamilyCart.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
