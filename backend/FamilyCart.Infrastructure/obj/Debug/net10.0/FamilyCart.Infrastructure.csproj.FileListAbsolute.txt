@@ -1,0 +1,16 @@
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\bin\Debug\net10.0\FamilyCart.Infrastructure.deps.json
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\bin\Debug\net10.0\FamilyCart.Infrastructure.dll
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\bin\Debug\net10.0\FamilyCart.Infrastructure.pdb
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\bin\Debug\net10.0\FamilyCart.Core.dll
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\bin\Debug\net10.0\FamilyCart.Core.pdb
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.AssemblyInfo.cs
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.sourcelink.json
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCa.08E7D522.Up2Date
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.dll
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\refint\FamilyCart.Infrastructure.dll
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\FamilyCart.Infrastructure.pdb
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Infrastructure\obj\Debug\net10.0\ref\FamilyCart.Infrastructure.dll

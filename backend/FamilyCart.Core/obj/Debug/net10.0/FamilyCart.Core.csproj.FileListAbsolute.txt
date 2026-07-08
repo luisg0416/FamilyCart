@@ -1,0 +1,13 @@
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\bin\Debug\net10.0\FamilyCart.Core.deps.json
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\bin\Debug\net10.0\FamilyCart.Core.dll
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\bin\Debug\net10.0\FamilyCart.Core.pdb
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.csproj.AssemblyReference.cache
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.AssemblyInfoInputs.cache
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.AssemblyInfo.cs
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.csproj.CoreCompileInputs.cache
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.sourcelink.json
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.dll
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\refint\FamilyCart.Core.dll
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\FamilyCart.Core.pdb
+C:\Users\Luis\FamilyCart\backend\FamilyCart.Core\obj\Debug\net10.0\ref\FamilyCart.Core.dll
