@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "IriBEt9X+RM=",
+  "dgSpecHash": "ik/zZDcPJbg=",
   "success": true,
   "projectFilePath": "C:\\Users\\Luis\\FamilyCart\\backend\\FamilyCart.Infrastructure\\FamilyCart.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -26,7 +26,9 @@
     "C:\\Users\\Luis\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.9\\microsoft.extensions.logging.abstractions.10.0.9.nupkg.sha512",
     "C:\\Users\\Luis\\.nuget\\packages\\microsoft.extensions.options\\10.0.9\\microsoft.extensions.options.10.0.9.nupkg.sha512",
     "C:\\Users\\Luis\\.nuget\\packages\\microsoft.extensions.options.configurationextensions\\10.0.9\\microsoft.extensions.options.configurationextensions.10.0.9.nupkg.sha512",
-    "C:\\Users\\Luis\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.9\\microsoft.extensions.primitives.10.0.9.nupkg.sha512"
+    "C:\\Users\\Luis\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.9\\microsoft.extensions.primitives.10.0.9.nupkg.sha512",
+    "C:\\Users\\Luis\\.nuget\\packages\\npgsql\\10.0.3\\npgsql.10.0.3.nupkg.sha512",
+    "C:\\Users\\Luis\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\10.0.2\\npgsql.entityframeworkcore.postgresql.10.0.2.nupkg.sha512"
   ],
   "logs": []
 }

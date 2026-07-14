@@ -8,5 +8,6 @@ namespace FamilyCart.Core.Models
         public required int FamilyId { get; set; } // References Family
         public required int UserId { get; set;} // References User
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
     }
 }

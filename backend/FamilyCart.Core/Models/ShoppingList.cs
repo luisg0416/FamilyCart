@@ -10,7 +10,7 @@ namespace FamilyCart.Core.Models
         public required int FamilyId { get; set; } // References Family
         public required int StoreId { get; set; } // References Store
         public required int CreatedById { get; set; } // References User
-        public List<ListItem> Items { get; set; } = new List<ListItem>();
+        public List<ListItem> ListItems { get; set; } = new();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
