@@ -2,6 +2,8 @@ using FamilyCart.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using FamilyCart.Core.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,26 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
+
+builder.Services.AddAuthorization();
+
+var signingKeyValue = builder.Configuration["Authentication:Schemes:Bearer:SigningKeys:0:Value"] ?? throw new InvalidOperationException("JWT signing key not found.");
+var signingKey = new SymmetricSecurityKey(Convert.FromBase64String(signingKeyValue));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.Audience = builder.Configuration["Authentication:Schemes:Bearer:ValidAudiences:0"];
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateAudience = true,
+        ValidAudience = options.Audience,
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Authentication:Schemes:Bearer:ValidIssuer"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = signingKey,
+        ValidateLifetime = true
+    };
+});
 
 builder.Services.AddIdentity<User, IdentityRole<int>>(options => 
 {
