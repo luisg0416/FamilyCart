@@ -4,6 +4,8 @@ using FamilyCart.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using FamilyCart.Infrastructure.Services;
+using FamilyCart.Core.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddControllers();
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var signingKeyValue = builder.Configuration["Authentication:Schemes:Bearer:SigningKeys:0:Value"] ?? throw new InvalidOperationException("JWT signing key not found.");
 var signingKey = new SymmetricSecurityKey(Convert.FromBase64String(signingKeyValue));
