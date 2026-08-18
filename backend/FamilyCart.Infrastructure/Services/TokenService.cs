@@ -7,6 +7,7 @@ namespace FamilyCart.Infrastructure.Services
     using Microsoft.IdentityModel.Tokens;
     using Microsoft.Extensions.Configuration;
     using System.Text;
+    using FamilyCart.Core.DTOs;
 
     public class TokenService : ITokenService
     {
@@ -16,7 +17,7 @@ namespace FamilyCart.Infrastructure.Services
         {
             _configuration = configuration;
         }
-        public string GetToken(User user)
+        public TokenResponseDto GetToken(User user)
         {
             string secret = _configuration["Authentication:Schemes:Bearer:SigningKeys:0:Value"] ?? throw new InvalidOperationException("JWT signing key not found.");
             string issuer = _configuration["Authentication:Schemes:Bearer:ValidIssuer"] ?? throw new InvalidOperationException("JWT issuer not found.");
@@ -25,7 +26,7 @@ namespace FamilyCart.Infrastructure.Services
             Claim[] claims = [
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-                new Claim(ClaimTypes.Name, user.UserName ?? "")
+                new Claim(JwtRegisteredClaimNames.Name, user.UserName ?? "")
             ];
 
             var key = new SymmetricSecurityKey(Convert.FromBase64String(secret));
@@ -39,8 +40,13 @@ namespace FamilyCart.Infrastructure.Services
                 expires: DateTime.UtcNow.AddMinutes(30)
             );
 
+            var token = new TokenResponseDto
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(jwt),
+                Expiration = jwt.ValidTo
+            };
 
-            return new JwtSecurityTokenHandler().WriteToken(jwt);;
+            return token;
         }
     }
 }

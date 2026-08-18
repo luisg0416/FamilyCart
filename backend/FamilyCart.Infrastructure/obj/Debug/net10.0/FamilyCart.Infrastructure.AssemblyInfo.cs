@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FamilyCart.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+493aa6445b89c4c98f5beae64eee88d23db36fed")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+18a1c1a1ae383991228eb28dbcdc3a31e4acab72")]
 [assembly: System.Reflection.AssemblyProductAttribute("FamilyCart.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FamilyCart.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

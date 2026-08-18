@@ -1,8 +1,9 @@
 namespace FamilyCart.Core.Interfaces
 {
+    using FamilyCart.Core.DTOs;
     using FamilyCart.Core.Models;
     public interface ITokenService
     {
-        string GetToken(User user);
+        TokenResponseDto GetToken(User user);
     }
 }
