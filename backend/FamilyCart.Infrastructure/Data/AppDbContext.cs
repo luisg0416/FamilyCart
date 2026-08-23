@@ -78,6 +78,8 @@ public class AppDbContext : IdentityDbContext <User, IdentityRole<int>, int>
                 .WithMany(u => u.FamiliesCreated)
                 .HasForeignKey(f => f.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasIndex(f => f.InviteCode).IsUnique();
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -88,9 +90,9 @@ public class AppDbContext : IdentityDbContext <User, IdentityRole<int>, int>
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(p => p.Family)
-            .WithMany(f => f.Products)
-            .HasForeignKey(p => p.FamilyId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(f => f.Products)
+                .HasForeignKey(p => p.FamilyId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
