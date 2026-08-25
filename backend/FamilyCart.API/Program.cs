@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using FamilyCart.Infrastructure.Services;
 using FamilyCart.Core.Interfaces;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,24 +24,11 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 var signingKeyValue = builder.Configuration["Authentication:Schemes:Bearer:SigningKeys:0:Value"] ?? throw new InvalidOperationException("JWT signing key not found.");
 var signingKey = new SymmetricSecurityKey(Convert.FromBase64String(signingKeyValue));
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-{
-    options.Audience = builder.Configuration["Authentication:Schemes:Bearer:ValidAudiences:0"];
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateAudience = true,
-        ValidAudience = options.Audience,
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Authentication:Schemes:Bearer:ValidIssuer"],
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = signingKey,
-        ValidateLifetime = true
-    };
-});
 
 builder.Services.AddIdentity<User, IdentityRole<int>>(options => 
 {
     options.SignIn.RequireConfirmedAccount = false; // keep false for now; testing
+    
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
@@ -65,6 +53,26 @@ builder.Services.Configure<IdentityOptions>(options =>
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.Audience = builder.Configuration["Authentication:Schemes:Bearer:ValidAudiences:0"];
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateAudience = true,
+        ValidAudience = options.Audience,
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Authentication:Schemes:Bearer:ValidIssuer"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = signingKey,
+        ValidateLifetime = true
+    };
+});
+
 
 var app = builder.Build();
 
