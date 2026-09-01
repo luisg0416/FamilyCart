@@ -52,6 +52,7 @@ namespace FamilyCart.API.Controllers
             return code;
         }
 
+        // Test Function
         [HttpGet("whoami")]
         public IActionResult WhoAmI()
         {

@@ -3,6 +3,8 @@ namespace FamilyCart.Core.Models {
         public int Id { get; set; } 
         public required string Name { get; set; }
         public string? InstacartStoreId { get; set; }
+        public Family? Family { get; set; }
+        public int? FamilyId { get; set; }
         public List<ShoppingList> ShoppingLists { get; set; } = new();
         public List<Product> Products { get; set; } = new();
     }

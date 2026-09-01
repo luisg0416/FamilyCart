@@ -4,6 +4,7 @@ namespace FamilyCart.Core.Models {
         public int Id { get; set; }
         public required User CreatedByUser { get; set; }
         public List<FamilyMember> FamilyMembers { get; set; } = new();
+        public List<Store> Stores { get; set; } = new();
         public List <Product> Products { get; set; } = new();
         public List<ShoppingList> ShoppingLists { get; set; } = new();
         public required string FamilyName { get; set; }

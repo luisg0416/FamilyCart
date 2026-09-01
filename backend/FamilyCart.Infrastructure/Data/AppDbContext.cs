@@ -94,6 +94,14 @@ public class AppDbContext : IdentityDbContext <User, IdentityRole<int>, int>
                 .HasForeignKey(p => p.FamilyId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<Store>(entity =>
+        {
+            entity.HasOne(s => s.Family)
+                .WithMany(f => f.Stores)
+                .HasForeignKey(s => s.FamilyId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 
 }

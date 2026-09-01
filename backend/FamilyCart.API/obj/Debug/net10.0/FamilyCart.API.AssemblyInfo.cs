@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FamilyCart.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c864668b0ccf66eaf8784af93bbebf099aa7a3e7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2e76e0646159293a2ff1a5232aa5bf3e74110171")]
 [assembly: System.Reflection.AssemblyProductAttribute("FamilyCart.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FamilyCart.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
