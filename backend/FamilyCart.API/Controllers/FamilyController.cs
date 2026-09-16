@@ -1,14 +1,12 @@
 namespace FamilyCart.API.Controllers
 {
     using FamilyCart.Core.DTOs;
-    using FamilyCart.Core.Interfaces;
     using FamilyCart.Core.Models;
     using FamilyCart.Infrastructure.Data;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
-    using System.Runtime.Intrinsics.X86;
     using System.Security.Claims;
     using System.Security.Cryptography;
 
