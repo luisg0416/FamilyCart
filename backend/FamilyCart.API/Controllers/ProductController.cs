@@ -89,7 +89,7 @@ namespace FamilyCart.API.Controllers
             return Ok(productResponseDto);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         public async Task<IActionResult> UpdateProduct(int id, UpdateProductDto updateProductDto)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -150,7 +150,7 @@ namespace FamilyCart.API.Controllers
 
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -212,6 +212,49 @@ namespace FamilyCart.API.Controllers
             }
 
             var products = await _appDBContext.Products.Where(p => p.StoreId == storeId).ToListAsync();
+
+            var productsResponseDto = products.Select(p => new ProductResponseDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Type = p.Type,
+                FamilyId = p.FamilyId,
+                StoreId = p.StoreId,
+                CreatedAt = p.CreatedAt
+            }).ToList();
+
+            return Ok(productsResponseDto);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(int storeId, string query)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized("Id showing as null");
+            }
+
+            var store = await _appDBContext.Stores.FindAsync(storeId);
+
+            if (store == null)
+            {
+                return NotFound("Store not found");
+            }
+
+            if (store.FamilyId != null)
+            {
+                bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == store.FamilyId && fm.UserId == userId);
+
+                if (!isMember)
+                {
+                    return StatusCode(403, "User is not a member of this Family");
+                }
+            }
+
+               var products = await _appDBContext.Products.Where(p => p.StoreId == storeId && EF.Functions.ILike(p.Name, $"%{query}%")).ToListAsync();
 
             var productsResponseDto = products.Select(p => new ProductResponseDto
             {
