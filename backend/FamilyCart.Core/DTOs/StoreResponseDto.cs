@@ -4,7 +4,6 @@ namespace FamilyCart.Core.DTOs
     {
         public required int Id { get; set; }
         public required string Name { get; set; }
-        public string? InstacartStoreId { get; set; }
-        public int? FamilyId { get; set; }
+        public required int FamilyId { get; set; }
     }
 }

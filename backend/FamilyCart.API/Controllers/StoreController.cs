@@ -60,8 +60,7 @@ namespace FamilyCart.API.Controllers
             {
                 Name = createStoreDto.Name,
                 Family = family,
-                FamilyId = createStoreDto.FamilyId,
-                InstacartStoreId = createStoreDto.InstacartStoreId
+                FamilyId = createStoreDto.FamilyId
             };
 
             _appDBContext.Stores.Add(store);
@@ -71,8 +70,7 @@ namespace FamilyCart.API.Controllers
             {
                 Id = store.Id,
                 Name = store.Name,
-                FamilyId = store.FamilyId,
-                InstacartStoreId = store.InstacartStoreId
+                FamilyId = store.FamilyId
             };
 
             return Ok(storeResponseDto);
@@ -109,13 +107,12 @@ namespace FamilyCart.API.Controllers
                 return NotFound("Family not found");
             }
 
-            var stores = await _appDBContext.Stores.Where(s => s.FamilyId == null || s.FamilyId == familyId).ToListAsync();
+            var stores = await _appDBContext.Stores.Where(s => s.FamilyId == familyId).ToListAsync();
 
             var storeDtos = stores.Select(s => new StoreResponseDto
                 {
                     Id = s.Id,
                     Name = s.Name,
-                    InstacartStoreId = s.InstacartStoreId,
                     FamilyId = s.FamilyId
                 }).ToList();
 
