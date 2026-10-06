@@ -1,0 +1,329 @@
+### FamilyCart smoke tests
+### Run each request from top to bottom ("Send Request" above each one).
+### Each request says what result to expect. Later requests reuse values
+### (tokens, ids) from earlier responses automatically, so keep the order.
+###
+### Start the API first:  dotnet run --project FamilyCart.API --launch-profile http
+
+@host = http://localhost:5208
+
+########################################################################
+# 1. AUTH
+########################################################################
+
+### 1a. Register Alice  → expect 200 (400 "DuplicateEmail" is fine on a re-run)
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Alice",
+  "lastName": "Tester",
+  "username": "alice",
+  "email": "alice@test.com",
+  "password": "Passw0rd!"
+}
+
+### 1b. Register Bob  → expect 200 (400 on a re-run is fine)
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Bob",
+  "lastName": "Tester",
+  "username": "bob",
+  "email": "bob@test.com",
+  "password": "Passw0rd!"
+}
+
+### 1c. Log in Alice  → expect 200 with a token
+# @name alice
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@test.com",
+  "password": "Passw0rd!"
+}
+
+### 1d. Log in Bob  → expect 200 with a token
+# @name bob
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "bob@test.com",
+  "password": "Passw0rd!"
+}
+
+### 1e. Wrong password  → expect 401 "Invalid Password"
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@test.com",
+  "password": "WrongPassword1!"
+}
+
+### 1f. No token  → expect 401
+GET {{host}}/api/family
+
+########################################################################
+# 2. FAMILIES
+########################################################################
+
+### 2a. Alice creates a family  → expect 200 with id + inviteCode
+# @name aliceFamily
+POST {{host}}/api/family
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "familyName": "Alice Household"
+}
+
+### 2b. Bob creates his own family  → expect 200
+# @name bobFamily
+POST {{host}}/api/family
+Authorization: Bearer {{bob.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "familyName": "Bob Household"
+}
+
+### 2c. Alice lists her families  → expect 200, only "Alice Household"
+GET {{host}}/api/family
+Authorization: Bearer {{alice.response.body.$.token}}
+
+########################################################################
+# 3. STORES  (changed today — every store must belong to a family)
+########################################################################
+
+### 3a. Alice creates a store  → expect 200, familyId = Alice's family, NO instacartStoreId field
+# @name aliceStore
+POST {{host}}/api/store
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Publix",
+  "familyId": {{aliceFamily.response.body.$.id}}
+}
+
+### 3b. Bob creates a store  → expect 200
+# @name bobStore
+POST {{host}}/api/store
+Authorization: Bearer {{bob.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Costco",
+  "familyId": {{bobFamily.response.body.$.id}}
+}
+
+### 3c. Alice lists her stores  → expect 200, ONLY "Publix" (not Bob's Costco)
+GET {{host}}/api/store/{{aliceFamily.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 3d. Bob tries to list Alice's stores  → expect 403
+GET {{host}}/api/store/{{aliceFamily.response.body.$.id}}
+Authorization: Bearer {{bob.response.body.$.token}}
+
+### 3e. Bob tries to create a store in Alice's family  → expect 403
+POST {{host}}/api/store
+Authorization: Bearer {{bob.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Sneaky Store",
+  "familyId": {{aliceFamily.response.body.$.id}}
+}
+
+########################################################################
+# 4. PRODUCTS  (changed today)
+########################################################################
+
+### 4a. Alice creates a product  → expect 200, NO type / instacartProductId fields
+# @name beef
+POST {{host}}/api/product
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Ground Beef",
+  "price": 7.99,
+  "familyId": {{aliceFamily.response.body.$.id}},
+  "storeId": {{aliceStore.response.body.$.id}}
+}
+
+### 4b. Alice creates a second product  → expect 200
+# @name turkey
+POST {{host}}/api/product
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Ground Turkey",
+  "price": 6.49,
+  "familyId": {{aliceFamily.response.body.$.id}},
+  "storeId": {{aliceStore.response.body.$.id}}
+}
+
+### 4c. Alice adds a product to BOB's store  → expect 403 "This store does not belong to your family."
+POST {{host}}/api/product
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Wrong Store Item",
+  "price": 1.00,
+  "familyId": {{aliceFamily.response.body.$.id}},
+  "storeId": {{bobStore.response.body.$.id}}
+}
+
+### 4d. List products in Alice's store  → expect 200, both products
+GET {{host}}/api/product/store/{{aliceStore.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 4e. Bob lists products in Alice's store  → expect 403 (this check used to be skipped for "global" stores)
+GET {{host}}/api/product/store/{{aliceStore.response.body.$.id}}
+Authorization: Bearer {{bob.response.body.$.token}}
+
+### 4f. Search "ground"  → expect 200, both Ground Beef and Ground Turkey
+GET {{host}}/api/product/search?storeId={{aliceStore.response.body.$.id}}&query=ground
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 4g. Bob searches Alice's store  → expect 403
+GET {{host}}/api/product/search?storeId={{aliceStore.response.body.$.id}}&query=ground
+Authorization: Bearer {{bob.response.body.$.token}}
+
+### 4h. Alice renames a product (partial update)  → expect 200, new name, price still 6.49
+PATCH {{host}}/api/product/{{turkey.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Ground Turkey 93/7",
+  "price": null
+}
+
+### 4i. Bob tries to edit Alice's product  → expect 403
+PATCH {{host}}/api/product/{{turkey.response.body.$.id}}
+Authorization: Bearer {{bob.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Hacked",
+  "price": null
+}
+
+########################################################################
+# 5. SHOPPING LISTS
+########################################################################
+
+### 5a. Alice creates a list for her store  → expect 200
+# @name list
+POST {{host}}/api/shoppinglist
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "listName": "Weekly Groceries",
+  "familyId": {{aliceFamily.response.body.$.id}},
+  "storeId": {{aliceStore.response.body.$.id}}
+}
+
+### 5b. Alice creates a list using BOB's store  → expect 403
+POST {{host}}/api/shoppinglist
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "listName": "Wrong Store List",
+  "familyId": {{aliceFamily.response.body.$.id}},
+  "storeId": {{bobStore.response.body.$.id}}
+}
+
+### 5c. Alice renames the list  → expect 200
+PUT {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "listName": "Weekly Groceries (Renamed)"
+}
+
+### 5d. Alice lists her family's lists  → expect 200, one list
+GET {{host}}/api/shoppinglist/family/{{aliceFamily.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+########################################################################
+# 6. LIST ITEMS
+########################################################################
+
+### 6a. Add Ground Beef to the list  → expect 200
+# @name item
+POST {{host}}/api/listitem
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "shoppingListId": {{list.response.body.$.id}},
+  "productId": {{beef.response.body.$.id}},
+  "quantity": 2
+}
+
+### 6b. Check the item off  → expect 200, isChecked true, quantity still 2
+PATCH {{host}}/api/listitem/{{item.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "isChecked": true
+}
+
+### 6c. Bob tries to edit Alice's list item  → expect 403
+PATCH {{host}}/api/listitem/{{item.response.body.$.id}}
+Authorization: Bearer {{bob.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "quantity": 99
+}
+
+########################################################################
+# 7. INVITE  — Bob joins Alice's family, then CAN see her data
+########################################################################
+
+### 7a. Alice adds Bob by email  → expect 200
+POST {{host}}/api/family/{{aliceFamily.response.body.$.id}}/invite
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "email": "bob@test.com"
+}
+
+### 7b. Bob lists Alice's stores now  → expect 200 (was 403 in 3d)
+GET {{host}}/api/store/{{aliceFamily.response.body.$.id}}
+Authorization: Bearer {{bob.response.body.$.token}}
+
+### 7c. Bob lists his families  → expect 200, BOTH households
+GET {{host}}/api/family
+Authorization: Bearer {{bob.response.body.$.token}}
+
+########################################################################
+# 8. CLEANUP / DELETES
+########################################################################
+
+### 8a. Delete the list item  → expect 204
+DELETE {{host}}/api/listitem/{{item.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 8b. Delete the turkey product  → expect 204
+DELETE {{host}}/api/product/{{turkey.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 8c. Delete the shopping list  → expect 204
+DELETE {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}

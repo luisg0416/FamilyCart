@@ -128,13 +128,10 @@ namespace FamilyCart.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("FamilyId")
+                    b.Property<int>("FamilyId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
-
-                    b.Property<string>("InstacartProductId")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -145,9 +142,6 @@ namespace FamilyCart.Infrastructure.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<int>("StoreId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -202,11 +196,8 @@ namespace FamilyCart.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("FamilyId")
+                    b.Property<int>("FamilyId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("InstacartStoreId")
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -491,7 +482,8 @@ namespace FamilyCart.Infrastructure.Migrations
                     b.HasOne("FamilyCart.Core.Models.Family", "Family")
                         .WithMany("Products")
                         .HasForeignKey("FamilyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("FamilyCart.Core.Models.Store", "Store")
                         .WithMany("Products")
@@ -536,7 +528,8 @@ namespace FamilyCart.Infrastructure.Migrations
                     b.HasOne("FamilyCart.Core.Models.Family", "Family")
                         .WithMany("Stores")
                         .HasForeignKey("FamilyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Family");
                 });
