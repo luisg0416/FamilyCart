@@ -56,7 +56,7 @@ namespace FamilyCart.API.Controllers
                 return NotFound("Store not found");
             }
 
-            if (store.FamilyId != null && store.FamilyId != createProductDto.FamilyId)
+            if (store.FamilyId != createProductDto.FamilyId)
             {
                 return StatusCode(403, "This store does not belong to your family.");
             }
@@ -65,7 +65,6 @@ namespace FamilyCart.API.Controllers
             {
                 Name = createProductDto.Name,
                 Price = createProductDto.Price,
-                Type = ProductType.Family,
                 Family = family,
                 FamilyId = createProductDto.FamilyId,
                 Store = store,
@@ -80,7 +79,7 @@ namespace FamilyCart.API.Controllers
                 Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
-                Type = product.Type,
+                ImageUrl = product.ImageUrl,
                 FamilyId = product.FamilyId,
                 StoreId = product.StoreId,
                 CreatedAt = product.CreatedAt
@@ -104,11 +103,6 @@ namespace FamilyCart.API.Controllers
             if (product == null)
             {
                 return NotFound("Product not found");
-            }
-
-            if(product.FamilyId == null)
-            {
-                return StatusCode(403, "Trying to edit Instacart Product");
             }
 
             bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == product.FamilyId && fm.UserId == userId);
@@ -140,7 +134,7 @@ namespace FamilyCart.API.Controllers
                 Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
-                Type = product.Type,
+                ImageUrl = product.ImageUrl,
                 FamilyId = product.FamilyId,
                 StoreId = product.StoreId,
                 CreatedAt = product.CreatedAt
@@ -165,11 +159,6 @@ namespace FamilyCart.API.Controllers
             if (product == null)
             {
                 return NotFound("Product not found");
-            }
-
-            if(product.FamilyId == null)
-            {
-                return StatusCode(403, "Cannot delete an Instacart Product");
             }
 
             bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == product.FamilyId && fm.UserId == userId);
@@ -201,14 +190,11 @@ namespace FamilyCart.API.Controllers
                 return NotFound("Store not found");
             }
 
-            if (store.FamilyId != null)
-            {
-                bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == store.FamilyId && fm.UserId == userId);
+            bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == store.FamilyId && fm.UserId == userId);
 
-                if (!isMember)
-                {
-                    return StatusCode(403, "User is not a member of this Family");
-                }
+            if (!isMember)
+            {
+                return StatusCode(403, "User is not a member of this Family");
             }
 
             var products = await _appDBContext.Products.Where(p => p.StoreId == storeId).ToListAsync();
@@ -218,7 +204,7 @@ namespace FamilyCart.API.Controllers
                 Id = p.Id,
                 Name = p.Name,
                 Price = p.Price,
-                Type = p.Type,
+                ImageUrl = p.ImageUrl,
                 FamilyId = p.FamilyId,
                 StoreId = p.StoreId,
                 CreatedAt = p.CreatedAt
@@ -244,14 +230,11 @@ namespace FamilyCart.API.Controllers
                 return NotFound("Store not found");
             }
 
-            if (store.FamilyId != null)
-            {
-                bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == store.FamilyId && fm.UserId == userId);
+            bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == store.FamilyId && fm.UserId == userId);
 
-                if (!isMember)
-                {
-                    return StatusCode(403, "User is not a member of this Family");
-                }
+            if (!isMember)
+            {
+                return StatusCode(403, "User is not a member of this Family");
             }
 
                var products = await _appDBContext.Products.Where(p => p.StoreId == storeId && EF.Functions.ILike(p.Name, $"%{query}%")).ToListAsync();
@@ -261,7 +244,7 @@ namespace FamilyCart.API.Controllers
                 Id = p.Id,
                 Name = p.Name,
                 Price = p.Price,
-                Type = p.Type,
+                ImageUrl = p.ImageUrl,
                 FamilyId = p.FamilyId,
                 StoreId = p.StoreId,
                 CreatedAt = p.CreatedAt

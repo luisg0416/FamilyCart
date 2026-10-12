@@ -109,7 +109,7 @@ namespace FamilyCart.API.Controllers
                 return NotFound("Store not found.");
             }
 
-            if (store.FamilyId != null && store.FamilyId != createShoppingListDto.FamilyId)
+            if (store.FamilyId != createShoppingListDto.FamilyId)
             {
                 return StatusCode(403, "This store does not belong to your family.");
             }
