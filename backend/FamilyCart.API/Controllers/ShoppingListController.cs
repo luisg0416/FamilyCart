@@ -24,7 +24,7 @@ namespace FamilyCart.API.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("family/{familyId}")]
+        [HttpGet("family/{familyId:int}")]
         public async Task<IActionResult> GetListsForFamily(int familyId)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -70,7 +70,12 @@ namespace FamilyCart.API.Controllers
             return Ok(shoppingListsDtos);
         }
 
-        // Work in progress
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetSingleList(int id)
+        {
+            return NoContent(); // Filler
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateShoppingList(CreateShoppingListDto createShoppingListDto)
         {
@@ -141,7 +146,7 @@ namespace FamilyCart.API.Controllers
             return Ok(shoppingListResponseDto);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateShoppingListName(int id, UpdateShoppingListDto updateShoppingListDto)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -187,7 +192,7 @@ namespace FamilyCart.API.Controllers
             return Ok(shoppingListResponseDto);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteShoppingList(int id)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
