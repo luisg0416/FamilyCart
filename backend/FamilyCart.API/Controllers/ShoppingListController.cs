@@ -73,7 +73,64 @@ namespace FamilyCart.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetSingleList(int id)
         {
-            return NoContent(); // Filler
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized("Id showing as null");
+            }
+
+            var user = await _userManager.FindByIdAsync(userIdString);
+
+              if (user == null)
+            {
+                return Unauthorized("User not found.");
+            }
+
+            var shoppingList = await _appDBContext.ShoppingLists.FindAsync(id);
+
+            if(shoppingList == null)
+            {
+                return NotFound("Shopping List not found.");
+            }
+
+            bool isMember = await _appDBContext.FamilyMembers.AnyAsync(fm => fm.FamilyId == shoppingList.FamilyId && fm.UserId == userId);
+
+            if (!isMember)
+            {
+                return StatusCode(403, "User is not a member of this Family");
+            }
+
+            var listItemDetailResponseDtos = await _appDBContext.ListItems
+                .Where(li => li.ShoppingListId == id)
+                .Select(li => new ListItemDetailResponseDto
+                {
+                    Id = li.Id,
+                    ProductId = li.ProductId,
+                    ProductName = li.Product.Name,
+                    Price = li.Product.Price,
+                    ImageUrl = li.Product.ImageUrl,
+                    Quantity = li.Quantity,
+                    IsChecked = li.IsChecked,
+                    AddedById = li.AddedById,
+                    AddedAt = li.AddedAt
+                })
+                .OrderBy(dto => dto.IsChecked)
+                .ThenBy(dto => dto.ProductName)
+                .ToListAsync();
+
+            var shoppingListDetailResponseDto = new ShoppingListDetailResponseDto
+            {
+                Id = shoppingList.Id,
+                ListName = shoppingList.ListName,
+                FamilyId = shoppingList.FamilyId,
+                StoreId = shoppingList.StoreId,
+                CreatedById = shoppingList.CreatedById,
+                CreatedAt = shoppingList.CreatedAt,
+                ListItems = listItemDetailResponseDtos
+            };
+
+            return Ok(shoppingListDetailResponseDto);
         }
 
         [HttpPost]
