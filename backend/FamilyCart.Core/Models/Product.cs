@@ -12,5 +12,6 @@ namespace FamilyCart.Core.Models
         public required int StoreId { get; set; } // References Store
         public List<ListItem> ListItems { get; set; } = new();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? ArchivedAt { get; set; }
     }
 }

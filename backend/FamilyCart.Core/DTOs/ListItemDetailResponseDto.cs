@@ -11,6 +11,7 @@ namespace FamilyCart.Core.DTOs
         public required bool IsChecked { get; set; }
         public required int AddedById { get; set; }
         public required DateTime AddedAt { get; set; }
+        public required bool IsArchived { get; set; }
         
     }
 }

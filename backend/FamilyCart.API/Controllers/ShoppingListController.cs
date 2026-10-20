@@ -113,7 +113,8 @@ namespace FamilyCart.API.Controllers
                     Quantity = li.Quantity,
                     IsChecked = li.IsChecked,
                     AddedById = li.AddedById,
-                    AddedAt = li.AddedAt
+                    AddedAt = li.AddedAt,
+                    IsArchived = li.Product.ArchivedAt != null
                 })
                 .OrderBy(dto => dto.IsChecked)
                 .ThenBy(dto => dto.ProductName)

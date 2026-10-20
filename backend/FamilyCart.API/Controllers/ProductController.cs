@@ -112,6 +112,11 @@ namespace FamilyCart.API.Controllers
                 return StatusCode(403, "User is not a member of this Family");
             }
 
+            if (product.ArchivedAt != null)
+            {
+                return NotFound("Product is already archived");
+            }
+
             if (updateProductDto.Name != null)
             {
                 product.Name = updateProductDto.Name;
@@ -168,7 +173,12 @@ namespace FamilyCart.API.Controllers
                 return StatusCode(403, "User is not a member of this Family");
             }
 
-            _appDBContext.Products.Remove(product);
+            if (product.ArchivedAt != null)
+            {
+                return NotFound("Product is already archived");
+            }
+
+            product.ArchivedAt = DateTime.UtcNow;
             await _appDBContext.SaveChangesAsync();
             return NoContent();
         }
@@ -197,7 +207,7 @@ namespace FamilyCart.API.Controllers
                 return StatusCode(403, "User is not a member of this Family");
             }
 
-            var products = await _appDBContext.Products.Where(p => p.StoreId == storeId).ToListAsync();
+            var products = await _appDBContext.Products.Where(p => p.StoreId == storeId && p.ArchivedAt == null).ToListAsync();
 
             var productsResponseDto = products.Select(p => new ProductResponseDto
             {
@@ -237,7 +247,7 @@ namespace FamilyCart.API.Controllers
                 return StatusCode(403, "User is not a member of this Family");
             }
 
-               var products = await _appDBContext.Products.Where(p => p.StoreId == storeId && EF.Functions.ILike(p.Name, $"%{query}%")).ToListAsync();
+               var products = await _appDBContext.Products.Where(p => p.StoreId == storeId && p.ArchivedAt == null && EF.Functions.ILike(p.Name, $"%{query}%")).ToListAsync();
 
             var productsResponseDto = products.Select(p => new ProductResponseDto
             {

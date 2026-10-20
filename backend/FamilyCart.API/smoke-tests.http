@@ -291,11 +291,72 @@ Content-Type: application/json
   "quantity": 99
 }
 
+### 6d. Add Ground Turkey to the list (left unchecked)  → expect 200
+# @name turkeyItem
+POST {{host}}/api/listitem
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "shoppingListId": {{list.response.body.$.id}},
+  "productId": {{turkey.response.body.$.id}},
+  "quantity": 1
+}
+
 ########################################################################
-# 7. INVITE  — Bob joins Alice's family, then CAN see her data
+# 7. LIST DETAIL  — GET /api/shoppinglist/{id} (list + its items)
 ########################################################################
 
-### 7a. Alice adds Bob by email  → expect 200
+### 7a. Alice gets the list with items  → expect 200, listItems has 2 entries
+###     ORDER: "Ground Turkey 93/7" FIRST (unchecked), "Ground Beef" LAST (checked)
+###     Alphabetically beef would come first, so this proves unchecked-first sorting.
+###     Each item shows productName, price (6.49 / 7.99), imageUrl null, quantity, isChecked.
+GET {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 7b. Uncheck Ground Beef  → expect 200, isChecked false
+PATCH {{host}}/api/listitem/{{item.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "isChecked": false
+}
+
+### 7c. Get the list again  → expect 200, both unchecked, now alphabetical:
+###     "Ground Beef" first, then "Ground Turkey 93/7"
+GET {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 7d. Alice creates a second, empty list  → expect 200
+# @name emptyList
+POST {{host}}/api/shoppinglist
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "listName": "Empty List",
+  "familyId": {{aliceFamily.response.body.$.id}},
+  "storeId": {{aliceStore.response.body.$.id}}
+}
+
+### 7e. Get the empty list  → expect 200, "listItems": []  (empty array, NOT null)
+GET {{host}}/api/shoppinglist/{{emptyList.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 7f. Bob tries to get Alice's list  → expect 403
+GET {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{bob.response.body.$.token}}
+
+### 7g. List that doesn't exist  → expect 404 "Shopping List not found."
+GET {{host}}/api/shoppinglist/999999
+Authorization: Bearer {{alice.response.body.$.token}}
+
+########################################################################
+# 8. INVITE  — Bob joins Alice's family, then CAN see her data
+########################################################################
+
+### 8a. Alice adds Bob by email  → expect 200
 POST {{host}}/api/family/{{aliceFamily.response.body.$.id}}/invite
 Authorization: Bearer {{alice.response.body.$.token}}
 Content-Type: application/json
@@ -304,26 +365,40 @@ Content-Type: application/json
   "email": "bob@test.com"
 }
 
-### 7b. Bob lists Alice's stores now  → expect 200 (was 403 in 3d)
+### 8b. Bob lists Alice's stores now  → expect 200 (was 403 in 3d)
 GET {{host}}/api/store/{{aliceFamily.response.body.$.id}}
 Authorization: Bearer {{bob.response.body.$.token}}
 
-### 7c. Bob lists his families  → expect 200, BOTH households
+### 8c. Bob lists his families  → expect 200, BOTH households
 GET {{host}}/api/family
 Authorization: Bearer {{bob.response.body.$.token}}
 
+### 8d. Bob gets Alice's list now  → expect 200 with both items (was 403 in 7f)
+GET {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{bob.response.body.$.token}}
+
 ########################################################################
-# 8. CLEANUP / DELETES
+# 9. CLEANUP / DELETES
+# Order matters: a product can't be deleted while a list item still
+# points at it (ListItem → Product is DeleteBehavior.Restrict).
 ########################################################################
 
-### 8a. Delete the list item  → expect 204
+### 9a. Delete the beef list item  → expect 204
 DELETE {{host}}/api/listitem/{{item.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}
 
-### 8b. Delete the turkey product  → expect 204
+### 9b. Delete the turkey list item  → expect 204
+DELETE {{host}}/api/listitem/{{turkeyItem.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 9c. Delete the turkey product  → expect 204
 DELETE {{host}}/api/product/{{turkey.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}
 
-### 8c. Delete the shopping list  → expect 204
+### 9d. Delete the shopping list  → expect 204
 DELETE {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 9e. Delete the empty list  → expect 204
+DELETE {{host}}/api/shoppinglist/{{emptyList.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}

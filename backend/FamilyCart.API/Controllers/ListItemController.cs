@@ -69,6 +69,11 @@ namespace FamilyCart.API.Controllers
                 return BadRequest("This product does not belong to the same store as the shopping list.");
             }
 
+            if(product.ArchivedAt != null)
+            {
+                return NotFound("Product not found");
+            }
+
             var listItem = new ListItem
             {
                 ShoppingList = shoppingList,

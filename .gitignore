@@ -1,0 +1,34 @@
+Info.txt
+.env
+backend/FamilyCart.API/appsettings.json
+backend/FamilyCart.API/appsettings.Development.json
+login-bad.json
+login.json
+register.json
+create-family.json
+join-bad.json
+join-family.json
+login2.json
+register2.json
+add-by-email-bad.json
+add-by-email.json
+register3.json
+create-list.json
+update-list.json
+product1.json
+product2.json
+product3.json
+remove-instacart.patch
+
+   # .NET build output / IDE
+   bin/
+   obj/
+   .vs/
+   *.user
+   *.suo
+
+      # Expo / React Native
+   node_modules/
+   .expo/
+   dist/
+   web-build/
