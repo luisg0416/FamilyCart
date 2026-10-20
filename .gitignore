@@ -20,15 +20,15 @@ product2.json
 product3.json
 remove-instacart.patch
 
-   # .NET build output / IDE
-   bin/
-   obj/
-   .vs/
-   *.user
-   *.suo
+# .NET build output / IDE
+bin/
+obj/
+.vs/
+*.user
+*.suo
 
-      # Expo / React Native
-   node_modules/
-   .expo/
-   dist/
-   web-build/
+    # Expo / React Native
+node_modules/
+.expo/
+dist/
+web-build/
