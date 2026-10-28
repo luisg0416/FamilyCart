@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using FamilyCart.Infrastructure.Services;
 using FamilyCart.Core.Interfaces;
-using Microsoft.Extensions.Options;
+using FamilyCart.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthorization();
 
@@ -71,6 +73,21 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = signingKey,
         ValidateLifetime = true
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+
+        }
+    };
 });
 
 
@@ -80,4 +97,5 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<FamilyHub>("/hubs/family");
 app.Run();

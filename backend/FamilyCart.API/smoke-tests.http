@@ -378,27 +378,111 @@ GET {{host}}/api/shoppinglist/{{list.response.body.$.id}}
 Authorization: Bearer {{bob.response.body.$.token}}
 
 ########################################################################
-# 9. CLEANUP / DELETES
-# Order matters: a product can't be deleted while a list item still
-# points at it (ListItem → Product is DeleteBehavior.Restrict).
+# 9. SOFT DELETE  — deleting a product archives it (ArchivedAt) instead
+#    of removing the row, so lists that already contain it keep working.
+#    State going in: the list has Ground Beef (unchecked) + Ground Turkey.
 ########################################################################
 
-### 9a. Delete the beef list item  → expect 204
+### 9a. Delete Ground Beef WHILE it's still on the list  → expect 204 (this used to be a 500)
+DELETE {{host}}/api/product/{{beef.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 9b. List products in Alice's store  → expect 200, ONLY "Ground Turkey 93/7"
+GET {{host}}/api/product/store/{{aliceStore.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 9c. Search "ground"  → expect 200, ONLY "Ground Turkey 93/7"
+GET {{host}}/api/product/search?storeId={{aliceStore.response.body.$.id}}&query=ground
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 9d. Get the list  → expect 200, BOTH items still there
+###     Ground Beef: "isArchived": true    Ground Turkey: "isArchived": false
+GET {{host}}/api/shoppinglist/{{list.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 9e. Add archived Ground Beef to the empty list  → expect 404 "Product not found"
+POST {{host}}/api/listitem
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "shoppingListId": {{emptyList.response.body.$.id}},
+  "productId": {{beef.response.body.$.id}},
+  "quantity": 1
+}
+
+### 9f. Edit archived Ground Beef  → expect 404 "Product not found"
+PATCH {{host}}/api/product/{{beef.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "price": 8.99
+}
+
+### 9g. Delete Ground Beef again  → expect 404 "Product is already archived"
+DELETE {{host}}/api/product/{{beef.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 9h. Check off the archived beef item on the existing list  → expect 200, isChecked true
+###     (shoppers can still finish a list after a product is archived)
+PATCH {{host}}/api/listitem/{{item.response.body.$.id}}
+Authorization: Bearer {{alice.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "isChecked": true
+}
+
+########################################################################
+# 10. CLEANUP / DELETES
+# Products are soft-deleted now, so order no longer matters for them.
+# Archived products stay in the database across re-runs — that's expected.
+########################################################################
+
+### 10a. Delete the beef list item  → expect 204
 DELETE {{host}}/api/listitem/{{item.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}
 
-### 9b. Delete the turkey list item  → expect 204
+### 10b. Delete the turkey list item  → expect 204
 DELETE {{host}}/api/listitem/{{turkeyItem.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}
 
-### 9c. Delete the turkey product  → expect 204
+### 10c. Delete (archive) the turkey product  → expect 204
 DELETE {{host}}/api/product/{{turkey.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}
 
-### 9d. Delete the shopping list  → expect 204
+### 10d. Delete the shopping list  → expect 204
 DELETE {{host}}/api/shoppinglist/{{list.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}
 
-### 9e. Delete the empty list  → expect 204
+### 10e. Delete the empty list  → expect 204
 DELETE {{host}}/api/shoppinglist/{{emptyList.response.body.$.id}}
 Authorization: Bearer {{alice.response.body.$.token}}
+
+########################################################################
+# 11. SIGNALR HUB  — /hubs/family
+# "negotiate" is the first HTTP request every SignalR client makes before
+# opening the WebSocket, so it's a quick way to check the hub is mapped
+# and that auth works. (Real-time events need the test client — later.)
+########################################################################
+
+### 11a. Negotiate with NO token  → expect 401 (hub has [Authorize])
+POST {{host}}/hubs/family/negotiate?negotiateVersion=1
+
+### 11b. Negotiate with token in the QUERY STRING  → expect 200
+###      Body has "connectionId", "connectionToken" and "availableTransports"
+###      (WebSockets should be listed). This proves OnMessageReceived works.
+POST {{host}}/hubs/family/negotiate?negotiateVersion=1&access_token={{alice.response.body.$.token}}
+
+### 11c. Negotiate with token in the HEADER  → expect 200
+###      (plain HTTP requests can still use the normal header)
+POST {{host}}/hubs/family/negotiate?negotiateVersion=1
+Authorization: Bearer {{alice.response.body.$.token}}
+
+### 11d. Garbage token in the query string  → expect 401
+POST {{host}}/hubs/family/negotiate?negotiateVersion=1&access_token=not-a-real-token
+
+### 11e. Token in the query string on a REST endpoint  → expect 401
+###      The path check limits query-string tokens to /hubs only.
+GET {{host}}/api/family?access_token={{alice.response.body.$.token}}
