@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace FamilyCart.API.Controllers
 {
     using FamilyCart.Core.DTOs;
@@ -10,7 +8,8 @@ namespace FamilyCart.API.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using System.Security.Claims;
-    using System.Security.Cryptography;
+    using FamilyCart.API.Hubs;
+    using Microsoft.AspNetCore.SignalR;
 
     [Authorize]
     [ApiController]
@@ -19,11 +18,13 @@ namespace FamilyCart.API.Controllers
     {
         private readonly AppDbContext _appDBContext;
         private readonly UserManager<User> _userManager;
+        private readonly IHubContext<FamilyHub, IFamilyClient> _hubContext;
 
-        public ListItemController(AppDbContext appDbContext, UserManager<User> userManager)
+        public ListItemController(AppDbContext appDbContext, UserManager<User> userManager, IHubContext<FamilyHub, IFamilyClient> hubContext)
         {
             _appDBContext = appDbContext;
             _userManager = userManager;
+            _hubContext = hubContext;
         }
 
         [HttpPost]
@@ -89,6 +90,23 @@ namespace FamilyCart.API.Controllers
             _appDBContext.ListItems.Add(listItem);
             await _appDBContext.SaveChangesAsync();
 
+            var listItemDetailResponseDto = new ListItemDetailResponseDto
+            {
+                Id = listItem.Id,
+                ProductId = listItem.ProductId,
+                ShoppingListId = listItem.ShoppingListId,
+                Quantity = listItem.Quantity,
+                IsChecked = listItem.IsChecked,
+                AddedById = listItem.AddedById,
+                AddedAt = listItem.AddedAt,
+                ProductName = product.Name,
+                Price = product.Price,
+                ImageUrl = product.ImageUrl,
+                IsArchived = false
+            };
+
+            await _hubContext.Clients.Group(FamilyHub.GroupName(shoppingList.FamilyId)).ListItemAdded(listItemDetailResponseDto);
+
             var listItemResponseDto = new ListItemResponseDto
             {
                 Id = listItem.Id,
@@ -134,6 +152,13 @@ namespace FamilyCart.API.Controllers
                 return StatusCode(403, "User is not a member of this Family");
             }
 
+            var product = await _appDBContext.Products.FindAsync(listItem.ProductId);
+
+            if (product == null)
+            {
+                return NotFound("Product not found");
+            }
+
             if (updateListItemDto.Quantity != null)
             {
                 listItem.Quantity = updateListItemDto.Quantity.Value;
@@ -144,7 +169,25 @@ namespace FamilyCart.API.Controllers
                 listItem.IsChecked = updateListItemDto.IsChecked.Value;
             }
 
+
             await _appDBContext.SaveChangesAsync();
+
+            var listItemDetailResponseDto = new ListItemDetailResponseDto
+            {
+                Id = listItem.Id,
+                ProductId = listItem.ProductId,
+                ShoppingListId = listItem.ShoppingListId,
+                Quantity = listItem.Quantity,
+                IsChecked = listItem.IsChecked,
+                AddedById = listItem.AddedById,
+                AddedAt = listItem.AddedAt,
+                ProductName = product.Name,
+                Price = product.Price,
+                ImageUrl = product.ImageUrl,
+                IsArchived = product.ArchivedAt != null
+            };
+
+            await _hubContext.Clients.Group(FamilyHub.GroupName(shoppingList.FamilyId)).ListItemUpdated(listItemDetailResponseDto);
 
             var listItemResponseDto = new ListItemResponseDto
             {
@@ -193,6 +236,7 @@ namespace FamilyCart.API.Controllers
 
             _appDBContext.ListItems.Remove(listItem);
             await _appDBContext.SaveChangesAsync();
+            await _hubContext.Clients.Group(FamilyHub.GroupName(shoppingList.FamilyId)).ListItemDeleted(listItem.Id, listItem.ShoppingListId);
             return NoContent();
         }
     }

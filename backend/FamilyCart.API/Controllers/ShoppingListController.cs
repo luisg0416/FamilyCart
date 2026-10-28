@@ -106,6 +106,7 @@ namespace FamilyCart.API.Controllers
                 .Select(li => new ListItemDetailResponseDto
                 {
                     Id = li.Id,
+                    ShoppingListId = li.ShoppingListId,
                     ProductId = li.ProductId,
                     ProductName = li.Product.Name,
                     Price = li.Product.Price,
