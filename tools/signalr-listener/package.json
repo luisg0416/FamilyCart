@@ -1,0 +1,16 @@
+{
+  "name": "familycart-signalr-listener",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Test tool: connects to the FamilyCart hub as a user and prints real-time list item events.",
+  "main": "listen.js",
+  "scripts": {
+    "listen": "node listen.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@microsoft/signalr": "10.0.0"
+  }
+}

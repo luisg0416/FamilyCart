@@ -4,6 +4,7 @@ namespace FamilyCart.Core.DTOs
     {
         public required int Id { get; set; }
         public required int ProductId { get; set; }
+        public required int ShoppingListId { get; set; }
         public required string ProductName { get; set; }
         public required decimal Price { get; set; }
         public string? ImageUrl { get; set; }
