@@ -8,7 +8,9 @@ namespace FamilyCart.API.Controllers
     using Microsoft.AspNetCore.Authorization;
     using System.Security.Claims;
     using Microsoft.EntityFrameworkCore;
-   
+    using FamilyCart.API.Hubs;
+    using Microsoft.AspNetCore.SignalR;
+
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
@@ -18,10 +20,13 @@ namespace FamilyCart.API.Controllers
         private readonly AppDbContext _appDBContext;
         private readonly UserManager<User> _userManager;
 
-        public ShoppingListController(AppDbContext appDbContext, UserManager<User> userManager)
+        private readonly IHubContext<FamilyHub, IFamilyClient> _hubContext;
+
+        public ShoppingListController(AppDbContext appDbContext, UserManager<User> userManager, IHubContext<FamilyHub, IFamilyClient> hubContext)
         {
             _appDBContext = appDbContext;
             _userManager = userManager;
+            _hubContext = hubContext;
         }
 
         [HttpGet("family/{familyId:int}")]
@@ -202,6 +207,8 @@ namespace FamilyCart.API.Controllers
                 CreatedAt = shoppingList.CreatedAt
             };
 
+            await _hubContext.Clients.Group(FamilyHub.GroupName(shoppingList.FamilyId)).ShoppingListCreated(shoppingListResponseDto);
+
             return Ok(shoppingListResponseDto);
         }
 
@@ -248,6 +255,8 @@ namespace FamilyCart.API.Controllers
                 CreatedAt = shoppingList.CreatedAt
             };
 
+            await _hubContext.Clients.Group(FamilyHub.GroupName(shoppingList.FamilyId)).ShoppingListUpdated(shoppingListResponseDto);
+
             return Ok(shoppingListResponseDto);
         }
 
@@ -284,6 +293,7 @@ namespace FamilyCart.API.Controllers
 
             _appDBContext.ShoppingLists.Remove(shoppingList);
             await _appDBContext.SaveChangesAsync();
+            await _hubContext.Clients.Group(FamilyHub.GroupName(shoppingList.FamilyId)).ShoppingListDeleted(shoppingList.Id);
 
             return NoContent();
         }

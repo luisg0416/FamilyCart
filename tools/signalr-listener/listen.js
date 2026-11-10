@@ -59,7 +59,7 @@ function time() {
 }
 
 function log(label, message) {
-  console.log(`[${time()}] ${label.padEnd(9)} ${message}`);
+  console.log(`[${time()}] ${label.padEnd(10)} ${message}`);
 }
 
 function describeItem(item) {
@@ -69,6 +69,10 @@ function describeItem(item) {
     `${check} ${item.productName}  qty ${item.quantity}  $${item.price}` +
     `  | item ${item.id}, list ${item.shoppingListId}${archived}`
   );
+}
+
+function describeList(list) {
+  return `"${list.listName}"  | list ${list.id}, store ${list.storeId}, family ${list.familyId}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -123,6 +127,12 @@ async function main() {
   connection.on("ListItemUpdated", (item) => log("UPDATED", describeItem(item)));
   connection.on("ListItemDeleted", (itemId, shoppingListId) =>
     log("DELETED", `item ${itemId} from list ${shoppingListId}`)
+  );
+
+  connection.on("ShoppingListCreated", (list) => log("LIST NEW", describeList(list)));
+  connection.on("ShoppingListUpdated", (list) => log("LIST UPD", describeList(list)));
+  connection.on("ShoppingListDeleted", (listId) =>
+    log("LIST DEL", `list ${listId} (and all its items)`)
   );
 
   // Groups are not remembered across reconnects, so join again.

@@ -6,5 +6,8 @@ namespace FamilyCart.API.Hubs
         Task ListItemAdded(ListItemDetailResponseDto listItemDetailResponseDto);
         Task ListItemUpdated(ListItemDetailResponseDto listItemDetailResponseDto);
         Task ListItemDeleted(int itemId, int shoppingListId);
+        Task ShoppingListCreated(ShoppingListResponseDto shoppingListResponseDto);
+        Task ShoppingListUpdated(ShoppingListResponseDto shoppingListResponseDto);
+        Task ShoppingListDeleted(int shoppingListId);
     }
 }
