@@ -15,6 +15,15 @@ services:
         interval: 10s
         timeout: 5s
         retries: 5
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: familycart_azurite
+    command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000 --location /data --skipApiVersionCheck
+    ports:
+      - "10000:10000"
+    volumes:
+      - azurite_data:/data
 
 volumes:
   db_data:
+  azurite_data:
