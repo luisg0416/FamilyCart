@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using FamilyCart.Infrastructure.Services;
 using FamilyCart.Core.Interfaces;
 using FamilyCart.API.Hubs;
+using FamilyCart.Infrastructure.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,11 @@ builder.Services.AddControllers();
 builder.Services.AddSignalR();
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddOptions<BlobStorageOptions>()
+.Bind(builder.Configuration.GetSection(BlobStorageOptions.SectionName))
+.ValidateDataAnnotations()
+.ValidateOnStart();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
